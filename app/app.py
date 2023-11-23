@@ -79,7 +79,8 @@ with tab2:
             st.dataframe(aux1)
     with col6:     
         aux3 = df.groupby(['day_period'])['id'].count().reset_index()      
-        graph3 = px.pie(aux3, names = 'day_period', values = 'id', color = 'day_period', title = 'DELIVERY BY DAY PERIOD')
+        graph3 = px.pie(aux3, names = 'day_period', values = 'id', hole = 0.5, color = 'day_period', title = 'DELIVERY BY DAY PERIOD')
+
         st.plotly_chart(graph3, use_container_width=True)
         with st.expander('More Info'):
             st.dataframe(aux3)
@@ -107,7 +108,7 @@ with tab3:
             st.dataframe(aux)
     with col4:
         aux1 = df.groupby(['city'])['time_taken(min)'].mean().reset_index()
-        graph1 = px.pie(aux1, names = 'city', values = 'time_taken(min)', color = 'city', title = 'DELIVERY TIME BY CITY')
+        graph1 = px.pie(aux1, names = 'city', values = 'time_taken(min)', hole = 0.5, color = 'city', title = 'DELIVERY TIME BY CITY')
         st.plotly_chart(graph1, use_container_width = True)
         with st.expander('More Info'):
             st.dataframe(aux1)
@@ -148,58 +149,209 @@ with tab4:
 
     with cols2:
         aux2 = df.groupby(['type_of_vehicle'])['time_taken(min)'].mean().reset_index()
-        graph2 = px.line( aux2, x = 'type_of_vehicle', y = 'time_taken(min)', title = 'DELIVERY TIME BY VEHICLE')
+        graph2 = px.bar( aux2, x = 'type_of_vehicle', y = 'time_taken(min)', color = 'type_of_vehicle', text_auto = '0.2s', title = 'DELIVERY TIME BY VEHICLE')
         st.plotly_chart(graph2, use_container_width = True)
         with st.expander('More Info'):
             st.dataframe(aux2)
 
     cols1, cols2 = st.columns(2)
     with cols1:
-        aux2 = df.groupby(['type_of_vehicle', 'road_traffic_density'])['time_taken(min)'].mean().reset_index()
-        graph2 = px.bar( aux2, x = 'type_of_vehicle', y = 'time_taken(min)', color = 'road_traffic_density', text_auto = '0.2s', title = 'DELIVERY TIME BY TRAFFIC')
-        st.plotly_chart(graph2, use_container_width = True)
-        with st.expander('More Info'):
-            st.dataframe(aux2)
+        operation = st.selectbox('Select the Operation: ', ('Traffic', 'Weather'))
+        if operation == 'Traffic':
+            aux2 = df.groupby(['type_of_vehicle', 'road_traffic_density'])['time_taken(min)'].mean().reset_index()
+            graph2 = px.bar( aux2, x = 'type_of_vehicle', y = 'time_taken(min)', color = 'road_traffic_density', text_auto = '0.2s', title = 'DELIVERY TIME BY TRAFFIC')
+            st.plotly_chart(graph2, use_container_width = True)
+            with st.expander('More Info'):
+                st.dataframe(aux2)
+        else:
+            aux2 = df.groupby(['type_of_vehicle', 'weather_conditions'])['time_taken(min)'].mean().reset_index()
+            graph2 = px.bar( aux2, x = 'type_of_vehicle', y = 'time_taken(min)', color = 'weather_conditions', text_auto = '0.2s', title = 'DELIVERY TIME BY WEATHER CONDITIONS')
+            st.plotly_chart(graph2, use_container_width = True)
+            with st.expander('More Info'):
+                st.dataframe(aux2)
 
     with cols2:
-        aux2 = df.groupby(['type_of_vehicle', 'weather_conditions'])['time_taken(min)'].mean().reset_index()
-        graph2 = px.bar( aux2, x = 'type_of_vehicle', y = 'time_taken(min)', color = 'weather_conditions', text_auto = '0.2s', title = 'DELIVERY TIME BY WEATHER CONDITIONS')
-        st.plotly_chart(graph2, use_container_width = True)
-        with st.expander('More Info'):
-            st.dataframe(aux2)
+        operation2 = st.selectbox('Select the Operation: ', ('Month', 'Day Period'))
+        if operation2 == 'Month':
+            aux2 = df.groupby(['type_of_vehicle', 'order_day_month'])['id'].count().reset_index()
+            graph2 = px.bar( aux2, x = 'type_of_vehicle', y = 'id', color = 'order_day_month', text_auto = '0.2s', title = 'VEHICLE DELIVERY BY MONTH')
+            st.plotly_chart(graph2, use_container_width = True)
+            with st.expander('More Info'):
+                st.dataframe(aux2)
+        else:
+            aux2 = df.groupby(['type_of_vehicle', 'day_period'])['id'].count().reset_index()
+            graph2 = px.bar( aux2, x = 'type_of_vehicle', y = 'id', color = 'day_period', text_auto = '0.2s', title = 'VEHICLE DELIVERY BY DAY PERIOD')
+            st.plotly_chart(graph2, use_container_width = True)
+            with st.expander('More Info'):
+                st.dataframe(aux2)
 
-    col1, col2 = st.columns(2)   
-    with col1:
-        aux2 = df.groupby(['type_of_vehicle', 'order_day_month'])['id'].count().reset_index()
-        graph2 = px.bar( aux2, x = 'type_of_vehicle', y = 'id', color = 'order_day_month', text_auto = '0.2s', title = 'VEHICLE DELIVERY BY MONTH')
-        st.plotly_chart(graph2, use_container_width = True)
-        with st.expander('More Info'):
-            st.dataframe(aux2)
-    with col2:
-        aux2 = df.groupby(['type_of_vehicle', 'day_period'])['id'].count().reset_index()
-        graph2 = px.bar( aux2, x = 'type_of_vehicle', y = 'id', color = 'day_period', text_auto = '0.2s', title = 'VEHICLE DELIVERY BY DAY PERIOD')
-        st.plotly_chart(graph2, use_container_width = True)
-        with st.expander('More Info'):
-            st.dataframe(aux2)
-    c1, c2 = st.columns(2)
-    with c1:
-        aux2 = df.groupby(['type_of_vehicle', 'order_day_week'])['id'].count().reset_index()
-        graph2 = px.line( aux2, x = 'type_of_vehicle', y = 'id', color = 'order_day_week', title = 'VEHICLE DELIVERY BY DAY OF THE WEEK')
-        st.plotly_chart(graph2, use_container_width = True)
-        with st.expander('More Info'):
-            st.dataframe(aux2)
-    with c2:
-        aux2 = df.groupby(['type_of_vehicle', 'order_day_month'])['id'].count().reset_index()
-        graph2 = px.line( aux2, x = 'type_of_vehicle', y = 'id', color = 'order_day_month', title = 'VEHICLE DELIVERY BY MONTH')
-        st.plotly_chart(graph2, use_container_width = True)
-        with st.expander('More Info'):
-            st.dataframe(aux2)
+    aux2 = df.groupby(['type_of_vehicle', 'order_day_month'])['id'].count().reset_index()
+    graph2 = px.line( aux2, x = 'type_of_vehicle', y = 'id', color = 'order_day_month', title = 'VEHICLE DELIVERY BY MONTH')
+    st.plotly_chart(graph2, use_container_width = True)
+    with st.expander('More Info'):
+        st.dataframe(aux2)
 
 #Time=====================================================================================================================================
 with tab5:
-    st.header('teste')
+    c1, c2 = st.columns(2)
+    with c1:
+        operation4 = st.selectbox('Select the Operation:  ', ('Traffic', 'Weather'))
+    with c2:
+        bool_param = st.selectbox('Select Order: ', ('Lowest', 'Higher'))
+
+    if bool_param == 'Higher':
+        bool_param = False
+    else:
+        bool_param = True
+
+    if operation4 == 'Traffic':
+        aux1 = df.groupby(['type_of_vehicle', 'road_traffic_density'])['time_taken(min)'].mean().reset_index().sort_values(['time_taken(min)'], ascending = bool_param)
+        graph1 = px.bar( aux1, x = 'type_of_vehicle', color = 'road_traffic_density', y = 'time_taken(min)', text_auto='0.2s', title = 'TOP VEHICLE DELIVERIES BY TYPE OF TRAFFIC')
+        st.plotly_chart(graph1, use_container_width = True)
+        with st.expander('More Info'):
+            st.dataframe(aux1)
+
+    else:
+        aux1 = df.groupby(['type_of_vehicle', 'weather_conditions'])['time_taken(min)'].mean().reset_index().sort_values(['time_taken(min)'], ascending = bool_param)
+        graph1 = px.bar( aux1, x = 'type_of_vehicle', color = 'weather_conditions', y = 'time_taken(min)', text_auto='0.2s', title = 'TOP VEHICLE DELIVERIES BY TYPE OF WEATHER')
+        st.plotly_chart(graph1, use_container_width = True)
+        with st.expander('More Info'):
+            st.dataframe(aux1)
+
+
+    operation3 = st.selectbox('Select the Operation: ', ('Month', 'Week', 'Day of Week', 'Day Period'))
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        if operation3 == 'Month':
+            aux2 = df.groupby(['order_day_month'])['time_taken(min)'].mean().reset_index()
+            graph2 = px.pie( aux2, names = 'order_day_month', values = 'time_taken(min)', hole = 0.5, title = 'DELIVERY TIME BY MONTH')
+            st.plotly_chart(graph2, use_container_width = True)
+            with st.expander('More Info'):
+                st.dataframe(aux2)
+
+        elif operation3 == 'Week':
+            aux2 = df.groupby(['number_week'])['time_taken(min)'].mean().reset_index()
+            graph2 = px.line( aux2, x = 'number_week', y = 'time_taken(min)', title = 'DELIVERY TIME BY WEEK')
+            st.plotly_chart(graph2, use_container_width = True)
+            with st.expander('More Info'):
+                st.dataframe(aux2)
+
+        elif operation3 == 'Day of Week':
+            aux2 = df.groupby(['order_day_week'])['time_taken(min)'].mean().reset_index()
+            graph2 = px.bar( aux2, x = 'order_day_week', y = 'time_taken(min)', color = 'order_day_week', text_auto = '0.2s', title = 'DELIVERY TIME BY DAY OF WEEK')
+            st.plotly_chart(graph2, use_container_width = True)
+            with st.expander('More Info'):
+                st.dataframe(aux2)
+        else:
+            aux2 = df.groupby(['day_period'])['time_taken(min)'].mean().reset_index()
+            graph2 = px.bar( aux2, x = 'day_period', y = 'time_taken(min)', color = 'day_period', text_auto = '0.2s', title = 'DELIVERY TIME BY DAY PERIOD')
+            st.plotly_chart(graph2, use_container_width = True)
+            with st.expander('More Info'):
+                st.dataframe(aux2)        
+
+    with col2:
+        if operation3 == 'Month':
+            aux2 = df.groupby(['road_traffic_density', 'order_day_month'])['time_taken(min)'].mean().reset_index()
+            graph2 = px.bar( aux2, x = 'road_traffic_density', y = 'time_taken(min)', color = 'order_day_month', text_auto = '0.2s', title = 'TYPE OF DELIVERY TRAFFIC BY MONTH')
+            st.plotly_chart(graph2, use_container_width = True)
+            with st.expander('More Info'):
+                st.dataframe(aux2)
+
+        elif operation3 == 'Week':
+            aux2 = df.groupby(['road_traffic_density', 'number_week'])['time_taken(min)'].mean().reset_index()
+            graph2 = px.line( aux2, x = 'road_traffic_density', y = 'time_taken(min)', color = 'number_week', title = 'TYPE OF DELIVERY TRAFFIC BY WEEK')
+            st.plotly_chart(graph2, use_container_width = True)
+            with st.expander('More Info'):
+                st.dataframe(aux2)
+
+        elif operation3 == 'Day of Week':
+            aux2 = df.groupby(['road_traffic_density', 'order_day_week'])['time_taken(min)'].mean().reset_index()
+            graph2 = px.bar( aux2, x = 'road_traffic_density', y = 'time_taken(min)', color = 'order_day_week', text_auto = '0.2s', title = 'TYPE OF DELIVERY TRAFFIC BY DAY OF WEEK')
+            st.plotly_chart(graph2, use_container_width = True)
+            with st.expander('More Info'):
+                st.dataframe(aux2)
+        else:
+            aux2 = df.groupby(['road_traffic_density', 'day_period'])['time_taken(min)'].mean().reset_index()
+            graph2 = px.bar( aux2, x = 'road_traffic_density', y = 'time_taken(min)', color = 'day_period', text_auto = '0.2s', title = 'TYPE OF DELIVERY TRAFFIC BY DAY PERIOD')
+            st.plotly_chart(graph2, use_container_width = True)
+            with st.expander('More Info'):
+                st.dataframe(aux2) 
+
+    if operation3 == 'Month':
+        aux2 = df.groupby(['weather_conditions', 'order_day_month'])['time_taken(min)'].mean().reset_index()
+        graph2 = px.bar( aux2, x = 'weather_conditions', y = 'time_taken(min)', color = 'order_day_month', text_auto = '0.2s', title = 'TIME DELIVERY OF WEATHER CONDITIONS BY MONTH')
+        st.plotly_chart(graph2, use_container_width = True)
+        with st.expander('More Info'):
+            st.dataframe(aux2)
+
+    elif operation3 == 'Week':
+        aux2 = df.groupby(['weather_conditions', 'number_week'])['time_taken(min)'].mean().reset_index()
+        graph2 = px.line( aux2, x = 'weather_conditions', y = 'time_taken(min)', color = 'number_week', title = 'TIME DELIVERY OF WEATHER CONDITIONS BY WEEK')
+        st.plotly_chart(graph2, use_container_width = True)
+        with st.expander('More Info'):
+            st.dataframe(aux2)
+
+    elif operation3 == 'Day of Week':
+        aux2 = df.groupby(['weather_conditions', 'order_day_week'])['time_taken(min)'].mean().reset_index()
+        graph2 = px.bar( aux2, x = 'weather_conditions', y = 'time_taken(min)', color = 'order_day_week', text_auto = '0.2s', title = 'TIME DELIVERY OF WEATHER CONDITIONS BY DAY OF WEEK')
+        st.plotly_chart(graph2, use_container_width = True)
+        with st.expander('More Info'):
+            st.dataframe(aux2)
+    else:
+        aux2 = df.groupby(['weather_conditions', 'day_period'])['time_taken(min)'].mean().reset_index()
+        graph2 = px.bar( aux2, x = 'weather_conditions', y = 'time_taken(min)', color = 'day_period', text_auto = '0.2s', title = 'TIME DELIVERY OF WEATHER CONDITIONS BY  DAY PERIOD')
+        st.plotly_chart(graph2, use_container_width = True)
+        with st.expander('More Info'):
+            st.dataframe(aux2) 
+
+    
+
 
 
 #Ratings=====================================================================================================================================
 with tab6:
-    st.header('teste')
+
+
+    cols1 , cols2 = st.columns(2)
+    with cols1:
+        aux2 = df.groupby(['time_range'])['delivery_person_ratings'].mean().reset_index().sort_values(['delivery_person_ratings'], ascending=False).drop_duplicates(subset=['delivery_person_ratings'])
+        graph2 = px.bar( aux2, x = 'time_range', y = 'delivery_person_ratings', color = 'time_range', text_auto = '0.2s', title = 'RATINGS BY DELIVERY RANGE')
+        st.plotly_chart(graph2, use_container_width = True)
+        with st.expander('More Info'):
+            st.dataframe(aux2) 
+
+    with cols2:
+        aux2 = df.groupby(['road_traffic_density'])['delivery_person_ratings'].mean().reset_index().sort_values(['delivery_person_ratings'], ascending=False).drop_duplicates(subset=['delivery_person_ratings']).head(10)
+        graph2 = px.line( aux2, x = 'road_traffic_density', y = 'delivery_person_ratings', title = 'RATINGS BY TRAFFIC TYPE')
+        st.plotly_chart(graph2, use_container_width = True)
+        with st.expander('More Info'):
+            st.dataframe(aux2) 
+
+    columns1 , columns2 = st.columns(2)
+    with columns1:
+        aux2 = df.groupby(['weather_conditions'])['delivery_person_ratings'].mean().reset_index().sort_values(['delivery_person_ratings'], ascending=False).drop_duplicates(subset=['delivery_person_ratings']).head(10)
+        graph2 = px.line( aux2, x = 'weather_conditions', y = 'delivery_person_ratings', title = 'RATINGS BY WEATHER')
+        st.plotly_chart(graph2, use_container_width = True)
+        with st.expander('More Info'):
+            st.dataframe(aux2) 
+    with columns2:
+        aux2 = df.groupby(['city'])['delivery_person_ratings'].mean().reset_index()
+        graph2 = px.pie( aux2, names = 'city', values = 'delivery_person_ratings', hole = 0.5, title = 'RATINGS BY TYPE OF CITY')
+        st.plotly_chart(graph2, use_container_width = True)
+        with st.expander('More Info'):
+            st.dataframe(aux2) 
+
+    columns3 , columns4 = st.columns(2)
+    with columns3:
+        aux2 = df.groupby(['delivery_person_id'])['time_taken(min)'].mean().reset_index().sort_values(['time_taken(min)'], ascending = True).drop_duplicates(subset = ['delivery_person_id']).head(10)
+        graph2 = px.bar( aux2, x = 'delivery_person_id', y = 'time_taken(min)', text_auto = '0.2s', title = 'TOP 10 FASTEST DELIVERIERS')
+        st.plotly_chart(graph2, use_container_width = True)
+        with st.expander('More Info'):
+            st.dataframe(aux2) 
+    with columns4:
+        aux2 = df.groupby(['delivery_person_id', 'ratings_level'])['delivery_person_ratings'].mean().reset_index().sort_values(['delivery_person_ratings'], ascending = False).drop_duplicates(subset = ['delivery_person_id']).head(10)
+        graph2 = px.bar( aux2, x = 'delivery_person_id', y = 'delivery_person_ratings', color = 'ratings_level', text_auto = '0.2s', title = 'TOP 10 DELIVERY DIVERS WITH BEST RATING')
+        st.plotly_chart(graph2, use_container_width = True)
+        with st.expander('More Info'):
+            st.dataframe(aux2) 
