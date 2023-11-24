@@ -20,18 +20,45 @@ import pickle
 
 # Page config and load data===================================================================================================================
 st.set_page_config(layout="wide")
-style_metric_cards(border_left_color="#FF4500")
+style_metric_cards(border_left_color="#00688B")
 df = pd.read_csv('../dataset/train.csv', low_memory= False)
 df2 = pd.read_csv('../model/model.csv', low_memory= False)
 df = data_cleaning(df)
 
 # Load Pickle model============================================================================================================================
 
-pickle_load = open('../model/xgb_model.pkl', 'rb')
-prediction = pickle.load(pickle_load)
+with open('../model/xgb_model.pkl', 'rb') as pickle_load:
+    prediction = pickle.load(pickle_load)
+
+with open('../parameters/le_day_period.pkl', 'rb') as file:
+    le_day_period = pickle.load(file)
+    le_day_period.fit(df['day_period'])
+
+with open('../parameters/le_weather_conditions.pkl', 'rb') as file:
+    le_weather_conditions = pickle.load(file)
+    le_weather_conditions.fit(df['weather_conditions'])
+
+with open('../parameters/le_road_traffic_density.pkl', 'rb') as file:
+    le_road_traffic_density = pickle.load(file)
+    le_road_traffic_density.fit(df['road_traffic_density'])
+
+with open('../parameters/le_type_of_vehicle.pkl', 'rb') as file:
+    le_type_of_vehicle = pickle.load(file)
+    le_type_of_vehicle.fit(df['type_of_vehicle'])
+
+with open('../parameters/le_order_day_week.pkl', 'rb') as file:
+    le_order_day_week = pickle.load(file)
+    le_order_day_week.fit(df['order_day_week'])
 
 def forecasting(day_period, day_week, traffic, weather, vehicle, festival, lat, lon):
-    prediction_result = prediction.predict([[day_period, day_week, traffic, weather, vehicle, festival, lat, lon]])
+
+    day_period_encoded = le_day_period.transform([day_period])[0]
+    day_week_encoded = le_order_day_week.transform([day_week])[0]
+    weather_encoded = le_weather_conditions.transform([weather])[0]
+    traffic_encoder = le_road_traffic_density.transform([traffic])[0]
+    vehicle_encoded = le_type_of_vehicle.transform([vehicle])[0]
+
+    prediction_result = prediction.predict([[day_period_encoded, day_week_encoded, traffic_encoder, weather_encoded, vehicle_encoded, festival, lat, lon]])
     print(prediction_result)
     
     return prediction_result
@@ -377,16 +404,16 @@ with tab6:
 with tab7:
     columns10, columns11 = st.columns(2)
     with columns10:
-        day_period = st.selectbox('Select Day Period: ', (df2['day_period'].unique()))
-        day_week = st.selectbox('Select Day of Week: ', (df2['order_day_week'].unique()))
-        traffic = st.selectbox('Select Day Traffic: ', (df2['road_traffic_density'].unique()))
-        lat = st.selectbox('Select Latitude: ', (df2['delivery_location_latitude'].unique()))
+        day_period = st.selectbox('Select Day Period: ', (df['day_period'].unique()))
+        day_week = st.selectbox('Select Day of Week: ', (df['order_day_week'].unique()))
+        traffic = st.selectbox('Select Day Traffic: ', (df['road_traffic_density'].unique()))
+        lat = st.selectbox('Select Latitude: ', (df['delivery_location_latitude'].unique()))
         
     with columns11:
-        vehicle = st.selectbox('Select a Type of Vehicle: ', (df2['type_of_vehicle'].unique()))
+        vehicle = st.selectbox('Select a Type of Vehicle: ', (df['type_of_vehicle'].unique()))
         festival = st.selectbox('Select Festival: ', (df2['festival'].unique()))
-        weather = st.selectbox('Select Type of Weathe Conditions: ', (df2['weather_conditions'].unique()))
-        lon = st.selectbox('Select Longitude: ', (df2['delivery_location_longitude'].unique()))
+        weather = st.selectbox('Select Type of Weathe Conditions: ', (df['weather_conditions'].unique()))
+        lon = st.selectbox('Select Longitude: ', (df['delivery_location_longitude'].unique()))
 
     if st.button('Predict'):
          result = forecasting(day_period, day_week, traffic, weather, vehicle, festival, lat, lon)
