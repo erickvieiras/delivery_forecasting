@@ -74,6 +74,12 @@ csv_data = convert_df(df)
 #image = Image.open('../img/logo.png')
 #st.sidebar.image(image)
 st.sidebar.title('Delivery Analytics')
+st.sidebar.download_button(
+        label="Download CSV Project File",
+        data=csv_data,
+        file_name='Fastfood Data Analysis.csv',
+        mime='text/csv',
+        )
 
 #Menu - Tabs===================================================================================================================================
 
@@ -81,13 +87,6 @@ tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs(['Home', 'Seasonality', 'Rout
 
 #Home Page=====================================================================================================================================
 with tab1:
-    st.download_button(
-        label="Download CSV Project File",
-        data=csv_data,
-        file_name='Fastfood Data Analysis.csv',
-        mime='text/csv',
-    )
-
     with st.expander('Dataset Information'):
         st.dataframe(df)
 
@@ -117,7 +116,7 @@ with tab2:
         graph2 = px.bar( aux2, x = 'order_day_week', y = 'id', color = 'order_day_week', text_auto = '0.2s', title = 'TOTAL DELIVERY BY DAY OF WEEK')
         st.plotly_chart(graph2, use_container_width = True)
         with st.expander('More Info'):
-            st.dataframe(aux1)
+            st.dataframe(aux2)
     with col6:     
         aux3 = df.groupby(['day_period'])['id'].count().reset_index()      
         graph3 = px.pie(aux3, names = 'day_period', values = 'id', hole = 0.5, color = 'day_period', title = 'TOTAL DELIVERY BY DAY PERIOD')
@@ -127,7 +126,7 @@ with tab2:
             st.dataframe(aux3)
 
     aux3 = df.groupby(['order_date'])['id'].count().reset_index()
-    graph3 = px.bar( aux3, x = 'order_date', y = 'id', text_auto = '0.2s', title = 'TOTAL TIMELINE OF DELIVERY')
+    graph3 = px.line( aux3, x = 'order_date', y = 'id', title = 'TOTAL TIMELINE OF DELIVERY')
     st.plotly_chart(graph3, use_container_width = True)
     with st.expander('More Info'):
         st.dataframe(aux3)
@@ -234,6 +233,11 @@ with tab4:
 
 #Time=====================================================================================================================================
 with tab5:
+    col1, col2, col3 = st.columns(3)
+    col3.metric('Total time of Deliveries Made', df['time_taken(min)'].sum())
+    col1.metric('Fastest delivery', df['time_taken(min)'].min())
+    col2.metric('Lowest delivery', df['time_taken(min)'].max())
+
     c1, c2 = st.columns(2)
     with c1:
         operation4 = st.selectbox('Select the Operation:  ', ('Traffic', 'Weather'))
@@ -348,7 +352,10 @@ with tab5:
 
 #Ratings=====================================================================================================================================
 with tab6:
-
+    col1, col2, col3 = st.columns(3)
+    col3.metric('Total Ratings', df['delivery_person_ratings'].count())
+    col1.metric('Best Rating Made', df['delivery_person_ratings'].max())
+    col2.metric('Worst Rating Made', df['delivery_person_ratings'].min())
 
     cols1 , cols2 = st.columns(2)
     with cols1:
@@ -417,6 +424,4 @@ with tab7:
 
     if st.button('Predict'):
          result = forecasting(day_period, day_week, traffic, weather, vehicle, festival, lat, lon)
-         st.success(np.round(result, 0))
-
-    
+         st.success('The delivery forecast for the features reported is {} Minutes'.format(np.round(result, 2)))
