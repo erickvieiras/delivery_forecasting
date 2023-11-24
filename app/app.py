@@ -12,6 +12,7 @@ from streamlit_folium import folium_static
 import plotly.graph_objects as go
 from PIL import Image
 import io
+from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_absolute_error, mean_absolute_percentage_error, mean_squared_error, r2_score, accuracy_score, f1_score
 import xgboost as xgb
@@ -21,6 +22,7 @@ import pickle
 st.set_page_config(layout="wide")
 style_metric_cards(border_left_color="#FF4500")
 df = pd.read_csv('../dataset/train.csv', low_memory= False)
+df2 = pd.read_csv('../model/model.csv', low_memory= False)
 df = data_cleaning(df)
 
 # Load Pickle model============================================================================================================================
@@ -28,12 +30,10 @@ df = data_cleaning(df)
 pickle_load = open('../model/xgb_model.pkl', 'rb')
 prediction = pickle.load(pickle_load)
 
-# Function to ML Model Forecasting
-
-def forecasting(city, day_period, day_week, traffic, weather, vehicle, festival, lat, lon):
-    
-    prediction_result = prediction.predict([[city, day_period, day_week, traffic, weather, vehicle, festival, lat, lon]])
+def forecasting(day_period, day_week, traffic, weather, vehicle, festival, lat, lon):
+    prediction_result = prediction.predict([[day_period, day_week, traffic, weather, vehicle, festival, lat, lon]])
     print(prediction_result)
+    
     return prediction_result
 
 #function convert to dataset download=========================================================================================================
@@ -377,16 +377,19 @@ with tab6:
 with tab7:
     columns10, columns11 = st.columns(2)
     with columns10:
-        city = st.selectbox('Select Type of City: ', (df['city'].unique()))
-        day_period = st.selectbox('Select Day Period: ', (df['day_period'].unique()))
-        day_week = st.selectbox('Select Day of Week: ', (df['order_day_week'].unique()))
-        traffic = st.selectbox('Select Day Period: ', (df['road_traffic_density'].unique()))
-        weather = st.selectbox('Select Type of Weathe Conditions: ', (df['weather_conditions'].unique()))
+        day_period = st.selectbox('Select Day Period: ', (df2['day_period'].unique()))
+        day_week = st.selectbox('Select Day of Week: ', (df2['order_day_week'].unique()))
+        traffic = st.selectbox('Select Day Traffic: ', (df2['road_traffic_density'].unique()))
+        lat = st.selectbox('Select Latitude: ', (df2['delivery_location_latitude'].unique()))
+        
     with columns11:
-        vehicle = st.selectbox('Select a Type of Vehicle: ', (df['type_of_vehicle'].unique()))
-        festival = st.selectbox('Select Festival: ', (df['festival'].unique()))
-        lat = st.selectbox('Select Latitude: ', (df['delivery_location_latitude'].unique()))
-        lon = st.selectbox('Select Longitude: ', (df['delivery_location_longitude'].unique()))
-    st.button('Predict')
+        vehicle = st.selectbox('Select a Type of Vehicle: ', (df2['type_of_vehicle'].unique()))
+        festival = st.selectbox('Select Festival: ', (df2['festival'].unique()))
+        weather = st.selectbox('Select Type of Weathe Conditions: ', (df2['weather_conditions'].unique()))
+        lon = st.selectbox('Select Longitude: ', (df2['delivery_location_longitude'].unique()))
+
+    if st.button('Predict'):
+         result = forecasting(day_period, day_week, traffic, weather, vehicle, festival, lat, lon)
+         st.success(np.round(result, 0))
 
     
