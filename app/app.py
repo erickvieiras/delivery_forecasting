@@ -71,8 +71,8 @@ def convert_df(dataset):
 csv_data = convert_df(df)
 
 #sidebar=======================================================================================================================================
-#image = Image.open('../img/logo.png')
-#st.sidebar.image(image)
+image = Image.open('../img/MKP_LOGO2.png')
+st.sidebar.image(image)
 st.sidebar.title('Delivery Analytics')
 st.sidebar.download_button(
         label="Download CSV Project File",
