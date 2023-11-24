@@ -38,10 +38,9 @@ def data_cleaning(df):
     df_to = df['time_orderd'].loc[df['time_orderd'] != 'NaN ']
 
     # Changing the variable type to native
-    df_to = pd.to_datetime(df_to, errors='coerce')
+    df_to = pd.to_datetime(df_to)
     df_to = df_to.dt.strftime('%H:%M')
-    rv = random.choice(df_to)
-    df['time_orderd'] = df['time_orderd'].apply(lambda x: rv if x == 'NaN ' else x)
+    df['time_orderd'] = df['time_orderd'].apply(lambda x: '18:30' if x == 'NaN ' else x)
 
     # Replacing 'NaN ' with the value of the most repeated variable .mode()
     df['road_traffic_density'] = df['road_traffic_density'].apply(lambda x: 'Low' if x == 'NaN ' else x)
