@@ -83,7 +83,7 @@ st.sidebar.download_button(
 
 #Menu - Tabs===================================================================================================================================
 
-tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs(['Home', 'Seasonality', 'Route', 'Vehicles', 'Time', 'Rating', 'Forecasting'])
+tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs(['Home', 'Seasonality', 'Route', 'Vehicles', 'Time', 'Rating', 'Geographic View', 'Forecasting'])
 
 #Home Page=====================================================================================================================================
 with tab1:
@@ -381,8 +381,8 @@ with tab6:
         with st.expander('More Info'):
             st.dataframe(aux2) 
     with columns2:
-        aux2 = df.groupby(['city'])['delivery_person_ratings'].mean().reset_index()
-        graph2 = px.pie( aux2, names = 'city', values = 'delivery_person_ratings', hole = 0.5, title = 'AVERAGE RATINGS BY TYPE OF CITY')
+        aux2 = df.groupby(['city'])['delivery_person_ratings'].count().reset_index()
+        graph2 = px.pie( aux2, names = 'city', values = 'delivery_person_ratings', hole = 0.5, title = 'TOTAL RATINGS BY TYPE OF CITY')
         st.plotly_chart(graph2, use_container_width = True)
         with st.expander('More Info'):
             st.dataframe(aux2) 
@@ -407,8 +407,87 @@ with tab6:
         st.plotly_chart(graph2, use_container_width = True)
         with st.expander('More Info'):
             st.dataframe(aux2) 
-#Forecasting===================================================================================================================================
+#Geographic View===================================================================================================================================
 with tab7:
+    type_select = st.selectbox('Select Option:  ', ('Best Restaurant Ratings', 'Faster Deliveries'))
+    def create_map(df_map, zoom=10):
+        if type_select == 'Best Restaurant Ratings':
+            df_map = df.loc[(df['ratings_level'] == 'Excellent') & (df['restaurant_latitude'] != 0) & (df['restaurant_longitude'] != 0)].head(200)
+            f = folium.Figure(width=1920, height=1080)
+
+            m = folium.Map(max_bounds=True, location=[df_map["restaurant_latitude"].mean(), df_map["restaurant_longitude"].mean()], zoom_start=zoom).add_to(f)
+
+            marker_cluster = MarkerCluster().add_to(m)
+
+            for _, line in df_map.iterrows():
+
+                delivery_person_id = line["delivery_person_id"]
+                delivery_person_age = line["delivery_person_age"]
+                day_period = line["day_period"]
+                type_of_vehicle = line["type_of_vehicle"]
+                delivery_person_ratings = line["delivery_person_ratings"]
+
+                html = "<p>ID: <strong>{}</strong></p>"
+                html += "Age: {}<br>"
+                html += "Day Period: {}<br>"
+                html += "Type of Vehicle: {}<br>"
+                html += "Aggragate Rating: {} /6.0"
+                html = html.format(delivery_person_id, delivery_person_age, day_period, type_of_vehicle, delivery_person_ratings)
+
+                popup = folium.Popup(
+                    folium.Html(html, script=True),
+                    max_width=500,
+                    )
+
+                folium.Marker(
+                    [line["restaurant_latitude"], line["restaurant_longitude"]],
+                    popup=popup,
+                    icon=folium.Icon(icon="home", prefix="fa"),
+                    ).add_to(marker_cluster)
+
+            folium_static(m, width=1024, height=468)
+        else:
+            df_map = df.loc[(df['time_taken(min)'] <= 27) & (df['delivery_location_latitude'] != 0) & (df['delivery_location_longitude'] != 0)].head(200)
+            f = folium.Figure(width=1920, height=1080)
+
+            m = folium.Map(max_bounds=True, location=[df_map["delivery_location_latitude"].mean(), df_map["delivery_location_longitude"].mean()], zoom_start=zoom).add_to(f)
+
+            marker_cluster = MarkerCluster().add_to(m)
+
+            for _, line in df_map.iterrows():
+
+                delivery_person_id = line["delivery_person_id"]
+                day_period = line["day_period"]
+                traffic = line["road_traffic_density"]
+                weather = line["weather_conditions"]
+                type_of_vehicle = line["type_of_vehicle"]
+                time = line["time_taken(min)"]
+
+                html = "<p>ID: <strong>{}</strong></p>"
+                html += "Day Period: {}<br>"
+                html += "Traffic: {}<br>"
+                html += "Weather: {}<br>"
+                html += "Type of Vehicle: {}<br>"
+                html += "Time Taken: {}"
+                html = html.format(delivery_person_id, day_period, traffic, weather, type_of_vehicle, time)
+
+                popup = folium.Popup(
+                        folium.Html(html, script=True),
+                        max_width=500,
+                        )
+
+                folium.Marker(
+                    [line["delivery_location_latitude"], line["delivery_location_longitude"]],
+                    popup=popup,
+                    icon=folium.Icon(icon="home", prefix="fa"),
+                    ).add_to(marker_cluster)
+
+            folium_static(m, width=1024, height=468)
+
+    create_map(df, zoom=3.5)
+
+#Forecasting===================================================================================================================================
+with tab8:
     columns10, columns11 = st.columns(2)
     with columns10:
         day_period = st.selectbox('Select Day Period: ', (df['day_period'].unique()))
