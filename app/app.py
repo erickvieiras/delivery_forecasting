@@ -21,32 +21,32 @@ import pickle
 # Page config and load data===================================================================================================================
 st.set_page_config(layout="wide")
 style_metric_cards(border_left_color="#00688B")
-df = pd.read_csv('../dataset/train.csv', low_memory= False)
-df2 = pd.read_csv('../model/model.csv', low_memory= False)
+df = pd.read_csv('dataset/train.csv', low_memory= False)
+df2 = pd.read_csv('model/model.csv', low_memory= False)
 df = data_cleaning(df)
 
 # Load Pickle model============================================================================================================================
 
-with open('../model/xgb_model.pkl', 'rb') as pickle_load:
+with open('model/xgb_model.pkl', 'rb') as pickle_load:
     prediction = pickle.load(pickle_load)
 
-with open('../parameters/le_day_period.pkl', 'rb') as file:
+with open('parameters/le_day_period.pkl', 'rb') as file:
     le_day_period = pickle.load(file)
     le_day_period.fit(df['day_period'])
 
-with open('../parameters/le_weather_conditions.pkl', 'rb') as file:
+with open('parameters/le_weather_conditions.pkl', 'rb') as file:
     le_weather_conditions = pickle.load(file)
     le_weather_conditions.fit(df['weather_conditions'])
 
-with open('../parameters/le_road_traffic_density.pkl', 'rb') as file:
+with open('parameters/le_road_traffic_density.pkl', 'rb') as file:
     le_road_traffic_density = pickle.load(file)
     le_road_traffic_density.fit(df['road_traffic_density'])
 
-with open('../parameters/le_type_of_vehicle.pkl', 'rb') as file:
+with open('parameters/le_type_of_vehicle.pkl', 'rb') as file:
     le_type_of_vehicle = pickle.load(file)
     le_type_of_vehicle.fit(df['type_of_vehicle'])
 
-with open('../parameters/le_order_day_week.pkl', 'rb') as file:
+with open('parameters/le_order_day_week.pkl', 'rb') as file:
     le_order_day_week = pickle.load(file)
     le_order_day_week.fit(df['order_day_week'])
 
@@ -71,9 +71,10 @@ def convert_df(dataset):
 csv_data = convert_df(df)
 
 #sidebar=======================================================================================================================================
-image = Image.open('../img/MKP_LOGO2.png')
+image = Image.open('img/MKP_LOGO2.png')
 st.sidebar.image(image)
 st.sidebar.title('Delivery Analytics')
+st.sidebar.divider()
 st.sidebar.download_button(
         label="Download CSV Project File",
         data=csv_data,
@@ -87,6 +88,25 @@ tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs(['Home', 'Seasonality',
 
 #Home Page=====================================================================================================================================
 with tab1:
+
+    st.header('About Project')
+    st.markdown('Marketplace Delivery Analysis is a project created for a food delivery marketplace, in order to collect businessmetrics, evaluate the volume of data and the residual impact of elements that directly influence one or more deliveries. This data relates the restaurant, delivery person and customer based on strategic decision making. Among the metrics that have a residual impact on the time spent on deliveries, we can highlight some such as:')
+    
+    coltex1, coltex2 = st.columns(2)
+    with coltex1:
+        st.markdown('1 - Vehicles and vehicle conditions')
+        st.markdown('2 - Delivery date')
+        st.markdown('3 - Delivery time')
+        st.markdown('4 - Type of traffic density')
+        st.markdown('5 - Weather conditions')
+        st.markdown('6 - type of city')
+    with coltex2:
+        st.markdown('7 - classification of deliveries')
+        st.markdown('8 - restaurant location')
+        st.markdown('9 - delivery location')
+        st.markdown('10 - order type')
+        st.markdown('11 - Multiple deliveries')
+        st.markdown('12 - age of delivery people')
     with st.expander('Dataset Information'):
         st.dataframe(df)
 
