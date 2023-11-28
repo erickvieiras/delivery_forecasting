@@ -5,16 +5,27 @@ Marketplace Delivery Analysis is a project created for a food delivery marketpla
 Among the metrics that have a residual impact on the time spent on deliveries, we can highlight some such as:
 
 1 - Vehicles and vehicle conditions
+
 2 - Delivery date
+
 3 - Delivery time
+
 4 - Type of traffic density
+
 5 - Weather conditions
+
 6 - type of city
+
 7 - classification of deliveries
+
 8 - restaurant location
+
 9 - delivery location
+
 10 - order type
+
 11 - Multiple deliveries
+
 12 - age of delivery people
 
 # Top Metrics:
