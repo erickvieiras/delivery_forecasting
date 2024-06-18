@@ -21,15 +21,6 @@ import pickle
 # Page config and load data===================================================================================================================
 st.set_page_config(layout="wide")
 style_metric_cards(border_left_color="#00688B")
-def inject_css(css: str):
-    st.markdown(f'<style>{css}</style>', unsafe_allow_html=True)
-
-css = """
-.stApp h1 {
-    margin-top: -50px;  /* Ajuste o valor conforme necessário */
-};
-"""
-inject_css(css)
 
 df = pd.read_csv('dataset/train.csv', low_memory= False)
 df2 = pd.read_csv('model/model.csv', low_memory= False)
